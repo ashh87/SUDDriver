@@ -106,8 +106,10 @@ int main(int argc, char* argv[])
 	}
 	 
 #endif 
-	if (resize_term(33, 120) == ERR)
+	if (resize_term(33, 120) == ERR) {
+                endwin();
 		return -1;
+        }
 	curs_set(0);
 	hasColor = has_colors();
 	if (hasColor)
@@ -119,8 +121,10 @@ int main(int argc, char* argv[])
 		init_pair(4, COLOR_GREEN, COLOR_BLACK); 
 		init_pair(5, COLOR_YELLOW, COLOR_BLACK);
 	}
-	if (hid_init())
+	if (hid_init()) {
+                endwin();
 		return -1;
+        }
 
 	clear();
 	refresh();
@@ -150,12 +154,14 @@ int main(int argc, char* argv[])
 
 	if (selected_sud == NULL) {
 		mvprintw(2, 2,"No device selected\n"); move(32,2); refresh();
+                endwin();
 		return 1;
 	}
 	// 1) Open the device
 	handle = hid_open_path(selected_sud->path);
 	if (!handle) {
 		mvprintw(2, 2, "unable to open device\n");  move(32,2); refresh();
+                endwin();
 		return 1;
 	}
 	hid_set_nonblocking(handle, 1);
@@ -166,7 +172,8 @@ int main(int argc, char* argv[])
 	if (res < 0)
 	{
 		mvprintw(2, 2, "Cannot send HELLOSUD\n");  move(32,2); refresh();
-		return -1;
+		endwin();
+                return -1;
 	}
 
 	drawConsole();
@@ -361,6 +368,7 @@ int main(int argc, char* argv[])
 		hid_close(handle);
 	}
 	free(devs);
+        endwin();
 	return exit;
 }
 void drawConsole()
